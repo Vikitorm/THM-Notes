@@ -1,132 +1,164 @@
-# Introduction to Cryptography
+# 🪐 Einführung in die Kryptographie
 
-### Terminology
-| Begriff | Beschreibung|
-| --------| -------------|
-| Kryptografischer Algorithmus | Bestimmt den Prozess der Verschlüsselung / Entschlüsselung |
-| Key | Wird von dem Algorithmus benötigt, um nach einem bestimmten Schema zu Verschlüsseln |
-| Plaintext | Normaler unverschlüsselter Text |
-| Ciphertext | Verschlüsselter Text |
+## 🔑 Terminologie
 
-## Symmetric Encryption
-Bei der symmetrischen Verschlüsselung wird **Plaintext** mit Hilfe eines **Keys** zu einem **Ciphertext**.
-Empfänger können mit demselben **Key** und **Ciphertext**, den **Plaintext** entschlüsseln.
+| Begriff                    | Beschreibung                                                                 |
+|---------------------------|------------------------------------------------------------------------------|
+| **Kryptografischer Algorithmus** | Bestimmt den Prozess der Verschlüsselung / Entschlüsselung                |
+| **Key (Schlüssel)**              | Wird vom Algorithmus benötigt, um nach einem bestimmten Schema zu verschlüsseln |
+| **Plaintext**                   | Normaler, unverschlüsselter Text                                          |
+| **Ciphertext**                  | Verschlüsselter Text                                                     |
 
-Symmetrische Verschlüsselung erreicht folgende Ziele:
-* **Confidentiality**: Nachrichten können von dritten nicht gelesen werden
-* **Integrity**: Nachrichten sind unverändert 
-*  **Authenticity**: Zugriff auf die Nachrichten wird durch den Schlüssel autorisiert
- 
-Programme für die Verwendung von symmetrischer Verschlüsselung:
-* GNU Privacy Guard
-* OpenSSL Project
+---
 
+## 🔒 Symmetrische Verschlüsselung
+
+- Der **Plaintext** wird mit einem **Key** in **Ciphertext** umgewandelt.
+- Empfänger können mit demselben **Key** und dem **Ciphertext** den ursprünglichen **Plaintext** entschlüsseln.
+
+### 🎯 Ziele
+
+- **Confidentiality**: Nachrichten können von Dritten nicht gelesen werden  
+- **Integrity**: Nachrichten bleiben unverändert  
+- **Authenticity**: Der Zugriff wird durch den Schlüssel autorisiert  
+
+### 🛠 Tools
+
+- **GNU Privacy Guard (gpg)**
+- **OpenSSL**
+
+```bash
+# Mit gpg verschlüsseln und entschlüsseln
 gpg --symmetric --cipher-algo CIPHER message.txt
-* Verschlüsselt eine Datei
-  
 gpg --output original_message.txt --decrypt message.gpg
-* Entschlüsselt eine Datei
 
+# Mit OpenSSL verschlüsseln und entschlüsseln
 openssl aes-256-cbc -e -in message.txt -out encrypted_message
-* Verschlüsselt eine Datei
-
 openssl aes-256-cbc -d -in encrypted_message -out original_message.txt
-* Entsachlüsselt eine Datei
 
+# Stärkere Verschlüsselung mit PBKDF2
 openssl aes-256-cbc -pbkdf2 -iter 10000 -e -in message.txt -out encrypted_message
-* -pbkdf2 & -iter 10000: Machen die Verschlüsselung stark gegen Brute-Force Angriffe
-
 openssl aes-256-cbc -pbkdf2 -iter 10000 -d -in encrypted_message -out original_message.txt
-* Stärkere entschlüsselung
+```
 
-## Asymmetrische Verschlüsselung
-* Ein Schlüsselpaar von öffentlichem-/privatem Schlüssel wird generiert
-* **Öffentlicher Schlüssel**: Kann mit anderen geteilt werden, um die Nachricht zu verschlüsseln (Integrity)
-* **Privater Schlüssel**: Wird mit niemanden geteilt, wird verwedet, um die Nachricht zu entschlüsseln
-* Öffentliche Schlüssel müssen für eine Einwandfreie Kommunikation ausgetauscht werden!
-* Die originalität des Privaten Schlüssels kann getestet werden, indem man mit dem privaten Schüssel eine Nachricht verschlüsselt und andere Teilnehmer diese mit dem zugehöregen Öffentlichen Schlüssel versuchen zu entschlüsseln
+---
 
-RSA
-* Name basiert auf den Namen der Entwickler dieser Technologie
-* Kann für die asymmetrische Verschlüsselung verwendet werden
-* (2 Primahlen p, q & 2 Integer Zahlen e, d müssen hierfür definiert werden)
-  * Basiert auf den Fakt, dass Faktorisierungen schwer zu berechnen sind
-  * P & q sollten sehr große Zahlen sein
-  * Wenn ein Angreifer p & q raten kann, sind die generierten Schlüssel unsicher
+## 🔐 Asymmetrische Verschlüsselung
 
+- Es wird ein **Schlüsselpaar** aus **öffentlichem** und **privatem** Schlüssel generiert.
+- Der **öffentliche Schlüssel**:
+  - Kann weitergegeben werden
+  - Wird zur **Verschlüsselung** verwendet
+- Der **private Schlüssel**:
+  - Bleibt geheim
+  - Wird zur **Entschlüsselung** verwendet
+- 🔁 **Test der Echtheit**:
+  - Eine Nachricht wird mit dem privaten Schlüssel verschlüsselt
+  - Andere Teilnehmer versuchen, sie mit dem öffentlichen Schlüssel zu entschlüsseln
+
+### 🔢 RSA (Rivest-Shamir-Adleman)
+
+- Basiert auf der Schwierigkeit der Faktorisierung großer Zahlen
+- Benötigt:
+  - Zwei große Primzahlen: `p`, `q`
+  - Zwei Integer-Zahlen: `e`, `d`
+
+```bash
+# RSA-Schlüsselpaar generieren
 openssl genrsa -out private-key.pem 2048
-* Generiert eine 2048 Bit Private Key
 
+# Öffentlichen Schlüssel aus privatem erzeugen
 openssl rsa -in private-key.pem -pubout -out public-key.pem
-* Leitet aus dem privaten Schlüssel einen öffentlichen Schlüssel
 
+# Private-Key-Inhalte anzeigen
 openssl rsa -in private-key.pem -text -noout
-* Gibt die Variablen des privaten Schlüssels preis
 
+# Datei mit öffentlichem Schlüssel verschlüsseln
 openssl pkeyutl -encrypt -in plaintext.txt -out ciphertext -inkey public-key.pem -pubin
-* Verschlüsselung mit dem öffentlichen Schlüssel
 
+# Datei mit privatem Schlüssel entschlüsseln
 openssl pkeyutl -decrypt -in ciphertext -inkey private-key.pem -out decrypted.txt
-* Entschlüsselung mit dem privaten Schlüssel
+```
 
-## Diffie-Hellman Key Exchange
-* Asymmetrischer Verschlüsselungs Algorithmus
-* Erlaubt den austausch von privaten Schlüsseln zur Sicheren Kommunikation
-  *  Beide Parteien einigen sich auf den Key
-*  Dieser Algorithmus kann in einer "Man-in-the-middel" Attacke angegriffen werden
+---
 
+## 🔄 Diffie-Hellman Schlüsselaustausch
+
+- Asymmetrischer Algorithmus zum sicheren Austausch eines gemeinsamen Schlüssels
+- Beide Parteien einigen sich auf einen gemeinsamen Schlüssel
+- ⚠️ **Verwundbar gegenüber Man-in-the-Middle-Angriffen**
+
+```bash
+# Parameter anzeigen
 openssl dhparam -in dhparams.pem -text -noout
-* Zeigt die Parameter des Diffie-Hellman Keys an
+```
 
-## Hashing
-* Funktion, welche eine größe Menge an Daten nimmt und einen Fixen Wert (Format) zurückgibt
+---
 
+## 🧮 Hashing
+
+- Eine Hash-Funktion erzeugt aus beliebigen Daten einen **fixen Wert** (Hash)
+
+```bash
+# SHA-256 Hash erzeugen
 sha256sum <Datei>
-* Bildet aus einer Datei einen sha256-Hash
-* Viele Datenbanken speichern Passwort-Hashes statt klare Passwörter
-* Zur wahrung der Integrität kann mit hashing festgestellt werden, ob eine Datei Modifikationen erhalten hat
-* Einige Hash-Funktionen wie SHA1 oder MD5 sind gebrochen, mit ihnen sollte nichts mehr auf die Integrität überprüft werden, da diese Hash-Kollisionen haben
-  * Dementsprechen kann eine Datei denselben Hash haben und zugleich einen anderen Inhalt haben
+```
 
-HMAC (Hash-based message authentication)
-* Schlüssel-Hash-Nachrichtenauthentifizierungscode
-  * Basiert auf eine Privaten Schlüssel & einer Hash-Funktion, ipad & opad
+### 🔍 Verwendung
 
+- Passwörter werden als Hash gespeichert, nicht im Klartext.
+- Hashes prüfen die **Integrität** von Dateien.
+
+> ⚠️ Veraltete Hash-Funktionen wie SHA1 und MD5 sind unsicher (Hash-Kollisionen möglich)
+
+### 🔐 HMAC (Hash-based Message Authentication Code)
+
+- Basiert auf einem **privaten Schlüssel**, einer **Hash-Funktion**, sowie `ipad` und `opad`
+
+```bash
+# HMAC berechnen
 hmac256 s!Kr37 message.txt
-* Bestimmten den HMAC für die Datei message.txt mit dem Schlüssel s!Kr37
+```
 
-## PKI and SSL/TLS
-* EIn Angreifer kann ja zweischen 2 Parteien bei Diffie-Hellman sein und die Kommunikation trotz dme Glaube der Sicherheit einsehen & verändern
-* Hier kommt PKI: Websites bestätigen ihre Identität mit einem Ausgestellten Zertifikat
-* Für die Signierung eines Zertifikats wird benötigt:
-  * CSR (Certificate Signing Request): Ein Zertifikat generieren
-  * Der öffentliche Schlüssel von einer CA signieren lassen
-    * Self-signing wird als unsicher betrachtet
+---
 
+## 🛡️ PKI und SSL/TLS
+
+- PKI schützt vor *Man-in-the-Middle*-Angriffen beim Schlüsselaustausch
+- **Websites verwenden digitale Zertifikate**, um ihre Identität zu bestätigen
+
+### 🔧 Zertifikate erstellen & inspizieren
+
+```bash
+# CSR (Certificate Signing Request) erzeugen
 openssl req -new -nodes -newkey rsa:4096 -keyout key.pem -out cert.csr
-* Generiert eine neue CSR
-  * req -new create a new certificate signing request
-  * -nodes save private key without a passphrase
-  * -newkey generate a new private key
-  * rsa:4096 generate an RSA key of size 4096 bits
-  * -keyout specify where to save the key
-  * -out save the certificate signing request
 
+# Selbst signiertes Zertifikat (nicht empfohlen)
 openssl req -x509 -newkey -nodes rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365
-* Generiert ein selbst signiertes Zertifikat (Nicht empfohlen)
 
+# Zertifikat inspizieren
 openssl x509 -in cert.pem -text
-* Inspizieren von einem Zertifikat
+```
 
-## Authenticating with Passwords
-* Username + Password: UNsichere Datenbank
-* Username + Hash(Password): Schon besser
-* Username + Hash(Password+Salt) + Salt: MEGA, es geht auch "hash(hash(password) + salt)"
+---
 
-## Cryptography and Data - Example
-* Client requests server’s SSL/TLS certificate
-* Server sends SSL/TLS certificate to the client
-* Client confirms that the certificate is valid
-* Wenn der Aussteller des Zertifikates bekannt ist, wird mit dem öffentlichem Schlüssel der verschlüsselte Hash entschlüsselt & mit dem Hash des Zertifikates verglichen
-* Sobal dieser Abgleich zutrifft, wird eine SSL/TLS initiiert
-  * Von da an wird jegliche Kommunikation verschlüsselt sein 
+## 🔐 Authentifizierung mit Passwörtern
+
+| Methode                            | Sicherheit     |
+|------------------------------------|----------------|
+| Username + Passwort                | ❌ Unsicher    |
+| Username + `Hash(Passwort)`        | ✔️ Besser      |
+| Username + `Hash(Passwort + Salt)` | ✅ Sehr gut     |
+| `Hash(Hash(Passwort) + Salt)`      | ✅✅ Noch besser |
+
+---
+
+## 🔁 Beispiel: Kryptografie im Datenfluss
+
+1. Client fordert das SSL/TLS-Zertifikat vom Server an  
+2. Server sendet Zertifikat zurück  
+3. Client prüft, ob das Zertifikat gültig ist:  
+   - Ist der Aussteller bekannt?  
+   - Hash stimmt mit Signatur überein?  
+4. SSL/TLS-Verbindung wird aufgebaut  
+   → Kommunikation ab diesem Punkt ist **verschlüsselt**
