@@ -159,7 +159,3 @@ Risiko ergibt sich aus der Wahrscheinlichkeit, dass eine Bedrohung eine Schwachs
 - Risk Management umfasst Erkennung, Bewertung, Reaktion & Überwachung
 - Nutzen aus qualitativer & quantitativer Analyse kombinieren
 - Auch Dritte (Supply Chain) bergen Risiken
-
-🔗 Weiter mit:  
-[Governance & Regulation](https://tryhackme.com/room/cybergovernanceregulation)  
-[Threat Modelling](https://tryhackme.com/room/threatmodelling)
